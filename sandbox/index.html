@@ -140,10 +140,21 @@
             <h3>Code :</h3>
                 <pre><code class="html">&lt;!-- Html --&gt;<br>&lt;div id="demo1"&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div data-year="2013"&gt;Short text here&lt;/div&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div data-year="2011" class="active"&gt;Short text here&lt;/div&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&lt;div data-year="2010"&gt;Short text here&lt;/div&gt;<br>&lt;/div&gt;</code><code class="javascript">/* Javascript */<br>$('#demo1').timeliny();</code></pre>
             <h3>Result :</h3>
+        <button class="btn granularity-years">Years</button> <button class="btn granularity-months">Months</button>
+        <br>
+        <br>
+        <br>
 				<div id="demo1">
-					<div data-year="2013">Short text here</div>
-					<div data-year="2011" class="active">Short text here</div>
-					<div data-year="2010">Short text here</div>
+                    <div data-year="2010" data-month="5">Original 2010 Month 5</div>
+                    <div data-year="2011" data-month="6" class="active">Original 2011 Month 6</div>
+                    <div data-year="2011" data-month="8" >Original 2011 Month 8</div>
+                    <div data-year="2011" data-month="12" >Original 2011 Month 12</div>
+					<div data-year="2013" data-month="3" >Original 2013 Month 3</div>
+                    <div data-year="2013" data-month="5" >Original 2013 Month 5</div>
+                    <div data-year="2013" data-month="12" >Original 2013 Month 12</div>
+                    <div data-year="2014" data-month="12" >Original 2014 Month 12</div>
+                    <div data-year="2015" data-month="3">Original 2015 Month 3</div>
+                    <div data-year="2017" data-month="6">Original 2017 Month 6</div>
 				</div>
 
     </div>
@@ -166,7 +177,7 @@
 	<script>
 		$(function() {
 			$('#demo1').timeliny({
-                hideBlankYears: true
+                hideBlankYears: false
             });
 		});
 	</script>

@@ -86,12 +86,23 @@
     .timeliny .timeliny-timeline .timeliny-timeblock {
       display: table-cell;
       position: relative; }
+    .timeliny .timeliny-timeline.year-view .timeliny-timeblock.initial_events {
+      display: inline;
+      z-index: 100;
+    }
+    .timeliny .timeliny-timeline.year-view .timeliny-timeblock.extra_events {
+      display: inline;
+      opacity: 0;
+    }
+    .timeliny .timeliny-timeline.month-view .timeliny-timeblock{
+      width:100px;
+    }
       .timeliny .timeliny-timeline .timeliny-timeblock.active .timeliny-dot {
         border-color: #37404A;
         background-color: #37404A;
-        -webkit-box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.33);
-        -moz-box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.33);
-        box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.33); }
+        -webkit-box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.33);
+        -moz-box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.33);
+        box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.33); }
         .timeliny .timeliny-timeline .timeliny-timeblock.active .timeliny-dot::before {
           color: #37404A; }
         .timeliny .timeliny-timeline .timeliny-timeblock.active .timeliny-dot::after {
@@ -109,7 +120,8 @@
       .timeliny .timeliny-timeline .timeliny-timeblock .timeliny-dot:hover::after {
         color: #000;
         opacity: 1; }
-  .timeliny .timeliny-vertical-line {
+
+.timeliny .timeliny-vertical-line {
     position: absolute;
     display: block;
     z-index: 1;
