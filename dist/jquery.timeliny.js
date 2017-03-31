@@ -101,6 +101,7 @@
                 var dot = $('.timeliny-dot');
                 var activeYear = $('.timeliny-timeblock.active').attr('data-year');
                 var month = $('.inactive-month');
+                var week = $('.inactive-week');
 
                 console.debug('years button clicked ~!~!~!~!~!~!~!~!~!~!~!~');
 
@@ -117,8 +118,10 @@
                 $(monthsBtn).attr("disabled", false);
                 $(weeksBtn).attr("disabled", false);
 
-                //Hide all months
+                //Hide all months/weeks
                 $(month).remove();
+                $(week).remove();
+
                 console.log('remove ghost months from view');
 
                 $( timeblock ).each(function(  ) {
@@ -142,11 +145,11 @@
                 var activeYear = $('.timeliny-timeblock.active').attr('data-year');
                 var extraEvents = $('.extra_events');
                 var dot = $('.timeliny-dot');
+                var week = $('.inactive-week');
 
                 yearsView = false;
                 weeksView = false;
                 monthsView = true;
-
 
                 console.debug('months button clicked ~!~!~!~!~!~!~!~!~!~!~!~');
 
@@ -159,6 +162,7 @@
                 $(extraEvents).removeClass('active');
 
                 $(dot).remove();
+                $(week).remove();
 
                 $( timeblock ).each(function(  ) {
 
@@ -188,6 +192,7 @@
                 var activeYear = $(active).attr('data-year');
                 var activeMonth = $(active).attr('data-month');
                 var weekEvents = $(timeline).find('[data-month= '+ activeMonth +']');
+                var month = $('.inactive-month');
 
                 console.log('weeks btn clicked ~!~!~!~!~!~!~!~!~!~!~!~');
 
@@ -207,11 +212,17 @@
                 $(timeblock).removeClass('visibleEvent');
                 $(weekEvents).addClass('visibleEvent');
 
+                //Hide all months
+                $(month).remove();
+
                 console.log('activeMonth', activeMonth);
 
                 $( timeblock ).each(function(  ) {
 
                     //Hide all inactive years
+                    if( $(this).attr('data-year') !== activeYear){
+                        $(this).hide();
+                    }
                     if( $(this).attr('data-month') !== activeMonth){
                         $(this).hide();
                     }
@@ -243,8 +254,6 @@
             var dot  = 			$('.timeliny-dot');
             var visibleEvent = 	$('.active');
 
-
-
             var index;
             var frameType;
 			var firstFrame;
@@ -263,11 +272,6 @@
             if(yearsView === true){
                 var firstYear = 	2008;
                 var lastYear = 		2020;
-
-                //disable the years button
-                $(yearsBtn).attr("disabled", true);
-
-                frameType = 'timeliny-year';
                 firstFrame = firstYear;
                 lastFrame =  lastYear;
                 index = 0;
@@ -275,6 +279,9 @@
                 eventsLog = [];
                 visibleEvents = $('.visibleEvent');
                 index = 0;
+
+                //disable the years button
+                $(yearsBtn).attr("disabled", true);
 
                 $(visibleEvents).each(function(){
 
@@ -296,21 +303,22 @@
             if(monthsView === true){
                 var firstMonth = 	1;
                 var lastMonth = 	12;
+                firstFrame = firstMonth;
+                lastFrame = lastMonth;
                 index = 0;
+                active = $('.timeliny-timeblock.active');
+                dataYear = $(active).attr('data-year');
+                var monthEvents = children.parent().find('[data-year=' + dataYear + ']');
+
+                eventsLog = [];
+
+                eventsLog.length = 0;
 
                 //disable the years button
                 $(monthsBtn).attr("disabled", true);
 
                 console.debug('month frames initialized');
 
-                active = $('.timeliny-timeblock.active');
-                dataYear = $(active).attr('data-year');
-
-                var monthEvents = children.parent().find('[data-year=' + dataYear + ']');
-
-                eventsLog = [];
-
-                eventsLog.length = 0;
                 console.log('clear log', eventsLog, monthEvents);
 
                 $(monthEvents).each(function(){
@@ -323,17 +331,16 @@
                 });
 
                 console.debug('eventsLog for Months', eventsLog);
-
-                firstFrame = firstMonth;
-                lastFrame = lastMonth;
-
-
             }
 
             if(weeksView === true){
                 var firstWeek = 1;
                 var lastWeek =  4;
+                firstFrame = firstWeek;
+                lastFrame = lastWeek;
                 index = 0;
+                dataYear = $('.active').attr('data-year');
+                dataMonth = $('.active').attr('data-month');
 
                 console.debug('Adding weeksView ghost frames');
 
@@ -341,21 +348,16 @@
                 $(weeksBtn).attr("disabled", true);
 
                 active = $('.timeliny-timeblock.active');
-                dataYear = $(active).attr('data-year');
-                dataMonth = $(active).attr('data-month');
-
-                firstFrame = firstWeek;
-                lastFrame = lastWeek;
 
                 var weekEvents = $(timeline).find('[data-year= '+ dataYear +'][data-month=' + dataMonth + ']').not(dot);
 
                 eventsLog = [];
 
                 eventsLog.length = 0;
-                console.log('clear log', eventsLog, weekEvents);
+                console.log('clear log', eventsLog, weekEvents, dataYear, dataMonth);
 
                 $(weekEvents).each(function(){
-                    console.log('setting up log', weekEvents);
+                    console.log('weeks log');
 
                     //Don't add repeating event weeks to Weeks Timeline.
                     if( $(this).attr('data-month') !== eventsLog[index - 1]){
@@ -377,17 +379,19 @@
             }
 
                 if (options.order === 'asc') {
-                    console.debug('ascending list---', firstFrame, lastFrame);
+                    console.debug('ascending list---STATS', firstFrame, lastFrame);
 
                     // Variable y is firstYear (2008), continue up through years if y is less than lastYear (2019)
                     for (var y = firstFrame; y < lastFrame + 1; y++) {
-                        dataYear  = 	$('.active').attr('data-year');
+                        dataYear = $(active).attr('data-year');
+                        dataMonth = $(active).attr('data-month');
 
-                        console.debug('trigger loop', y, dataYear);
+                        console.debug('trigger loop', y, firstFrame, lastFrame);
 
                         if(yearsView === true){
                             console.log('Adding yearsView ghost frames');
 
+                            frameType = 'timeliny-year';
                             prevFrame = children.parent().parent().find('[data-year='+ (y - 1) +']').not(dot);
                             nextFrame = children.parent().parent().find('[data-year='+ (y + 1) +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ y +']').not(dot);
@@ -412,15 +416,13 @@
 
                         if(weeksView === true){
                             console.debug('Adding weeksView ghost frames');
-
-                            frameType = 'timeliny-week';
                             firstFrame = firstWeek;
                             lastFrame = lastWeek;
 
+                            frameType = 'timeliny-week';
+
                             prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ (y - 1) +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ y +']').not(dot);
-                            dataYear = $(thisFrame).attr('data-year');
-                            dataMonth = $(thisFrame).attr('data-month');
                             ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + y + '" class="inactive inactive-week">'+y+' ghost frame</div>';
 
                         }
@@ -431,12 +433,12 @@
 
                             // if y is greater than firstFrame, place ghost item after event
                             if (y > firstFrame) {
-                                console.log('y is > than firstFrame', y, dataYear);
+                                console.log('y is > than firstFrame', y, firstFrame);
                                $(prevFrame).last().after(ghostFrame);
 
                                 //if y is less than firstFrame, place ghost frame as first item
                             } else {
-                                console.log('y is < firstFrame', y, dataYear);
+                                console.log('y is < firstFrame', y, firstFrame);
                                 //add class to ghost events
 
                                 console.debug('PLACEMENT...');
@@ -454,12 +456,21 @@
 
                                     }
 
+                                    if(weeksView == true){
+                                        console.debug('Weeks configuration', dataYear, dataMonth, y);
+
+                                        $(timeline).find('[data-year="' + dataYear + '"][data-month="' + dataMonth + '"]').first().not(dot).before(ghostFrame).addClass('firstFrame ' );
+
+                                    }
+
 
                             }
 
                         }
                         else{
                             console.debug('event exists...');
+
+                            $(thisFrame).show();
 
                             //If y is less than event then place before
                             if (y < eventsLog[index]) {
@@ -604,25 +615,12 @@
 		    console.debug('initialize dots...' );
 
             children = $('.timeliny-timeline').children();
-            //
-            // if( yearsView === true ){
-            //     children = $('.timeliny-timeline').children();
-            //     console.log('year dots...');
-            // }
-            //
-            // if( monthsView === true ){
-            //     console.debug('month dots...');
-            //
-            // }
-
-
-
 
 			children.each(function(  ) {
 				var text =$(this).html();
 				var year = $(this).attr('data-year');
                 var month = $(this).attr('data-month');
-                var week = $(this).attr('data-month');
+                var week = $(this).attr('data-week');
                 var dot = $(this).find('.timeliny-dot');
                 var dotHtml;
                 var current = year + month;
@@ -699,17 +697,17 @@
         var currYear = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-year');
         var currMonth = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-month');
         var currWeek = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-week');
-        var current = currYear + currMonth;
+        var current = currYear + currMonth + currWeek;
         var nextYear = $(this).attr('data-year');
         var nextMonth = $(this).attr('data-month');
         var nextWeek = $(this).attr('data-week');
-        var next = nextYear + nextMonth;
+        var next = nextYear + nextMonth + nextWeek;
 
         $(this).toggleClass('clicked');
 
 
-        var currTarget = currYear + currMonth;
-        var nextTarget = nextYear + nextMonth;
+        var currTarget = currYear + currMonth + currWeek;
+        var nextTarget = nextYear + nextMonth + nextWeek;
 
         if (current != next) {
                 hook('onLeave', [currTarget, nextTarget]);

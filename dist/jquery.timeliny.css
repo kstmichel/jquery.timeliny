@@ -47,15 +47,39 @@
     border-radius: 50%;
     border: 1px solid #ddd;
     background-color: #fff; }
-    .timeliny .timeliny-dot::before {
+.timeliny .year-view .timeliny-dot::before {
+  -webkit-transition: all 0.35s ease-in-out;
+  -moz-transition: all 0.35s ease-in-out;
+  transition: all 0.35s ease-in-out;
+  content: attr(data-year);
+  display: block;
+  position: absolute;
+  top: -5rem;
+  left: 1.25rem;
+  width: 100px;
+  color: #000; }
+.timeliny .month-view .timeliny-dot::before {
+  -webkit-transition: all 0.35s ease-in-out;
+  -moz-transition: all 0.35s ease-in-out;
+  transition: all 0.35s ease-in-out;
+  content: attr(data-month) ' / ' attr(data-year) ;
+  display: block;
+  position: absolute;
+  top: -5rem;
+  left: 1.25rem;
+  width: 100px;
+  color: #000; }
+    .timeliny .weeks-view .timeliny-dot::before {
       -webkit-transition: all 0.35s ease-in-out;
       -moz-transition: all 0.35s ease-in-out;
       transition: all 0.35s ease-in-out;
-      content: attr(data-year);
+      content: ' Week ' attr(data-week)  ' \A  ' attr(data-month) ' / ' attr(data-year) ;
       display: block;
+      white-space: pre;
       position: absolute;
       top: -5rem;
       left: 1.25rem;
+      width: 100px;
       color: #000; }
     .timeliny .timeliny-dot::after {
       -webkit-transition: all 0.35s ease-in-out;
