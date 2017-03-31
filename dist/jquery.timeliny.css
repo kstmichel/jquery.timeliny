@@ -121,6 +121,15 @@
     .timeliny .timeliny-timeline.month-view .timeliny-timeblock{
       width:100px;
     }
+    .timeliny .timeliny-timeline.weeks-view .timeliny-timeblock{
+      position: relative;
+      min-width: 50px;
+      width: 200px;
+      height: 200px;
+      margin-top: -100px;
+      max-width: 300px;
+      display: inline-flex;
+    }
       .timeliny .timeliny-timeline .timeliny-timeblock.active .timeliny-dot {
         border-color: #37404A;
         background-color: #37404A;
