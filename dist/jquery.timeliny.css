@@ -110,17 +110,17 @@
     .timeliny .timeliny-timeline .timeliny-timeblock {
       display: table-cell;
       position: relative; }
-    .timeliny .timeliny-timeline.year-view .timeliny-timeblock.initial_events {
+    .timeliny .timeliny-timeline .timeliny-timeblock.initial_events {
       display: inline;
       z-index: 100;
     }
-    .timeliny .timeliny-timeline.year-view .timeliny-timeblock.extra_events {
+    .timeliny .timeliny-timeline .timeliny-timeblock.extra_events {
       display: inline;
       opacity: 0;
     }
-    .timeliny .timeliny-timeline.month-view .timeliny-timeblock{
+    /*.timeliny .timeliny-timeline.month-view .timeliny-timeblock{
       width:100px;
-    }
+    }*/
     .timeliny .timeliny-timeline.weeks-view .timeliny-timeblock{
       position: relative;
       min-width: 50px;

@@ -27,11 +27,11 @@
 		function _init() {
 			hook('onInit');
 
-			_reorderElems();
+			// _reorderElems();
 			if (options.hideBlankYears === false) {
                 _addGhostElems();
             }
-            _granularity();
+      _granularity();
 			_createWrapper();
 			_createDots();
 			_fixBlockSizes();
@@ -50,8 +50,10 @@
 		function _reorderElems() {
 			children.detach().sort(function(a, b) {
 				return 	options.order === 'asc' ?
-						$(a).data('year') - $(b).data('year') :
+
+        		$(a).data('year') - $(b).data('year') :
 						$(b).data('year') - $(a).data('year');
+
 			});
 
 			$el.append(children);
@@ -71,7 +73,12 @@
 
 
 			var currYear = $el.find('.' + options.className + '-timeblock.active').first().attr('data-year');
-			hook('afterLoad', [currYear]);
+      var currMonth = $el.find('.' + options.className + '-timeblock.active').first().attr('data-month');
+      var currWeek = $el.find('.' + options.className + '-timeblock.active').first().attr('data-week');
+
+
+      console.log('curr mark', currYear, currMonth, currWeek);
+			hook('afterLoad', [currYear, currMonth, currWeek]);
             _updateTimelinePos();
 
 		}
@@ -130,9 +137,7 @@
                     if( $(this).attr('data-year') !== activeYear){
                         $(this).show();
                     }
-
                 });
-
 
                 _addGhostElems();
                 _updateTimelinePos();
@@ -142,7 +147,7 @@
             $(monthsBtn).click(function(){
                 var timeline = $('.timeliny-timeline');
                 var timeblock = $('.timeliny-timeblock');
-                var activeYear = $('.timeliny-timeblock.active').attr('data-year');
+                var dataYear = $('.timeliny-timeblock.active').attr('data-year');
                 var extraEvents = $('.extra_events');
                 var dot = $('.timeliny-dot');
                 var week = $('.inactive-week');
@@ -160,6 +165,7 @@
                 $(timeline).removeClass('year-view weeks-view');
                 $(timeline).addClass('month-view');
                 $(extraEvents).removeClass('active');
+                $(timeblock).removeClass('extra_events initial_events');
 
                 $(dot).remove();
                 $(week).remove();
@@ -167,21 +173,32 @@
                 $( timeblock ).each(function(  ) {
 
                     //Hide all inactive years
-                    if( $(this).attr('data-year') !== activeYear){
+                    if( $(this).attr('data-year') !== dataYear){
+                        $(this).removeClass('visibleEvent');
                         $(this).hide();
+                          console.log('remove visible from hidden years', dataYear);
+
                     }
                     else{
-                        //Add class to current events
-                        $(this).addClass('visibleEvent');
+
+                      //Check if this month value is equal to previous month values...
+                      //If so, hide this frame. We only show the first event per month.
+
+                        if($(this).attr('data-month') == $('.visibleEvent').attr('data-month')){
+                          console.log('remove extra months');
+                          $(this).last().hide();
+                        }
+                        else{
+                          //Add class to current events
+                          $(this).addClass('visibleEvent');
+                        }
                     }
 
                 });
 
-
                 _addGhostElems();
                 _updateTimelinePos();
                 _clickBehavior();
-
 
             });
 
@@ -233,7 +250,6 @@
 
                 });
 
-
                 _addGhostElems();
                 _updateTimelinePos();
                 _clickBehavior();
@@ -256,7 +272,7 @@
 
             var index;
             var frameType;
-			var firstFrame;
+			      var firstFrame;
             var lastFrame;
             var thisFrame;
             var eventsLog;
@@ -296,6 +312,8 @@
                     }
                 });
 
+                index = 0;
+
                 console.debug('eventsLog for Years', eventsLog);
 
             }
@@ -305,6 +323,7 @@
                 var lastMonth = 	12;
                 firstFrame = firstMonth;
                 lastFrame = lastMonth;
+                visibleEvents = $('.visibleEvent');
                 index = 0;
                 active = $('.timeliny-timeblock.active');
                 dataYear = $(active).attr('data-year');
@@ -321,14 +340,23 @@
 
                 console.log('clear log', eventsLog, monthEvents);
 
-                $(monthEvents).each(function(){
+
+                var month = $(active).attr('data-month');
+
+
+                $(visibleEvents).each(function(){
+                  active = $('.timeliny-timeblock.active');
+                  dataYear = $(active).attr('data-year');
+                  var month = $(this).attr('data-month');
 
                     //Don't add repeating event months to Months Timeline.
-                    if( $(this).attr('data-year') !== eventsLog[index - 1]){
+                    if( $.inArray(month, eventsLog) == -1 ){
                         eventsLog.push($(this).attr('data-month'));
                         index++;
                     }
                 });
+
+                index = 0;
 
                 console.debug('eventsLog for Months', eventsLog);
             }
@@ -438,7 +466,7 @@
 
                                 //if y is less than firstFrame, place ghost frame as first item
                             } else {
-                                console.log('y is < firstFrame', y, firstFrame);
+                                console.log('y is firstFrame', y, firstFrame);
                                 //add class to ghost events
 
                                 console.debug('PLACEMENT...');
@@ -462,64 +490,20 @@
                                         $(timeline).find('[data-year="' + dataYear + '"][data-month="' + dataMonth + '"]').first().not(dot).before(ghostFrame).addClass('firstFrame ' );
 
                                     }
-
-
                             }
-
                         }
                         else{
-                            console.debug('event exists...');
+                            console.debug('event exists...', y, index, eventsLog);
 
                             $(thisFrame).show();
 
-                            //If y is less than event then place before
-                            if (y < eventsLog[index]) {
-                                console.debug('LESS than data-month then place before', y, '<', eventsLog[index]);
-
-                                //If previous Ghost frame exists, print another right after
-                                if($(prevFrame).length ){
-                                    $(prevFrame).after(ghostFrame).addClass(frameType);
-                                }
-
-                                //If previous Ghost frame
-                                else{
-                                    $(active).first().before(ghostFrame).addClass(frameType);
-
-                                }
-
-                            }
-
                             //If y is equal to event, don't print ghost frame
                             if (y == eventsLog[index]) {
-                                console.debug('Equal to data-month, no frame', y, '===', eventsLog[index], index);
+                                console.debug('y Equal to EventLog, print no frame', y, '===', eventsLog[index], index);
                                 //Change link to event attribute instead of data-year
 
-                                var currentFrame = document.querySelectorAll('[data-month="'+ y +'"]');
-                                var currentEvent = $(timeline).find('[data-month='+ (y) +'][data-year='+ dataYear +']').not(dot);
 
-
-                                $(currentFrame).find('.timeliny-dot').attr('href', eventsLog[index]);
-
-                                if( !$(currentEvent).hasClass('only_event') ){
-                                    index++;
-                                    console.debug('add to i', index, eventsLog[index], $(currentEvent));
-                                }
-                                else{
-                                    console.debug('has only_event');
-                                }
-                                console.debug('currentEvent', currentEvent);
-
-                            }
-
-                            //If counter is greater than event, print frame after
-                            if (y > eventsLog[index]) {
-                                console.debug('GREATER, dont print ghost frame', y, '>', eventsLog[index]);
-                                $(prevFrame).after(' <div data-year="' + dataYear + '" data-month="' + y + '" class="inactive timeliny-timeblock timeliny-month afterFrame"> '+y+' larger ghost month</div>');
-                            }
-
-
-							if(yearsView == true){
-                                // console.debug($('.extra_events'));
+                                console.debug('Mark extra events', $('.extra_events'));
 
                                 if( $(thisFrame).length >= 2){
                                     $(thisFrame).first().addClass("initial_events");
@@ -529,9 +513,16 @@
                                     $(thisFrame).first().addClass("only_event").removeClass("initial_events");
                                 }
 
-                            }
-						}
 
+                                if( $(thisFrame).hasClass('only_event') || $(thisFrame).hasClass('initial_events') ){
+                                    index++;
+                                    console.debug('not Only Event: add to index:', index, eventsLog[index]);
+                                }
+                                else{
+                                    console.debug('has only_event');
+                                }
+                            }
+						              }
                     }
 
                     //If timeline is in descending order...
@@ -563,7 +554,6 @@
 
                     //Remove Month Classes and reset active class
                     $(extraEvents).each(function(){
-
 
                         console.debug('extraEvents...removed month attributes',  dataYear, dataMonth);
 
@@ -654,6 +644,8 @@
 			var activeDotPos = $el.find('.' + options.className + '-timeblock.active').position().left;
 			var dotRadius = $el.find('.' + options.className + '-timeblock.active .' + options.className + '-dot').width() / 2;
 
+console.log('timeblock active where are you', $('.timeliny-timeblock.active'));
+
 			var diff = activeDotPos - linePos;
 			var left;
 
@@ -669,11 +661,12 @@
 				if (typeof callEvent != 'undefined') {
 					if (callEvent === 'click') {
 
-						var currYear = $el.find('.' + options.className + '-timeblock.active').first().attr('data-year');
+						            var currYear = $el.find('.' + options.className + '-timeblock.active').first().attr('data-year');
                         var currMonth = $el.find('.' + options.className + '-timeblock.active').first().attr('data-month');
-                        var current = currYear + currMonth;
+                        var currWeek = $el.find('.' + options.className + '-timeblock.active').first().attr('data-week');
+                        var current = currYear + currMonth + currWeek;
 
-                        console.debug('CLICKEDDDDDDDDD', 'years', yearsView, 'months', monthsView, 'current',current);
+                        console.debug('CLICKEDDDDDDDDD', 'years', yearsView, 'months', monthsView,'weeks', weeksView, 'current',current);
 
                         hook('afterChange', [current]);
 
@@ -935,7 +928,7 @@
         hideBlankYears: false,
 		onInit: function() {},
 		onDestroy: function() {},
-		afterLoad: function(currYear) {},
+		afterLoad: function(currYear, currMonth, currWeek) {},
 		onLeave: function(currYear, nextYear) {},
 		afterChange: function(currYear) {},
 		afterResize: function() {}
