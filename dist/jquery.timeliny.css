@@ -81,6 +81,18 @@
       left: 1.25rem;
       width: 100px;
       color: #000; }
+  .timeliny .days-view .timeliny-dot::before {
+    -webkit-transition: all 0.35s ease-in-out;
+    -moz-transition: all 0.35s ease-in-out;
+    transition: all 0.35s ease-in-out;
+    content: attr(data-day)  '/' attr(data-month) '/' attr(data-year) ;
+    display: block;
+    white-space: pre;
+    position: absolute;
+    top: -5rem;
+    left: 1.25rem;
+    width: 100px;
+    color: #000; }
     .timeliny .timeliny-dot::after {
       -webkit-transition: all 0.35s ease-in-out;
       -moz-transition: all 0.35s ease-in-out;
@@ -115,7 +127,7 @@
       z-index: 100;
     }
     .timeliny .timeliny-timeline .timeliny-timeblock.extra_events {
-      display: inline;
+      display: inline !important;
       opacity: 0;
     }
     /*.timeliny .timeliny-timeline.month-view .timeliny-timeblock{
