@@ -208,7 +208,7 @@
                 var active =  $('.timeliny-timeblock.active');
                 var activeYear = $(active).attr('data-year');
                 var activeMonth = $(active).attr('data-month');
-                var weekEvents = $(timeline).find('[data-month= '+ activeMonth +']');
+                // var weekEvents = $(timeline).find('[data-month= '+ activeMonth +']');
                 var month = $('.inactive-month');
 
                 console.log('weeks btn clicked ~!~!~!~!~!~!~!~!~!~!~!~');
@@ -225,27 +225,40 @@
                 $(timeline).removeClass('year-view month-view');
                 $(timeline).addClass('weeks-view');
 
-                //Reinitializing visibleEvents
-                $(timeblock).removeClass('visibleEvent');
-                $(weekEvents).addClass('visibleEvent');
+                //Remove markings for extra and initial events
+                $(timeblock).removeClass('extra_events initial_events');
+
 
                 //Hide all months
                 $(month).remove();
 
                 console.log('activeMonth', activeMonth);
 
-                $( timeblock ).each(function(  ) {
+                // $('.timeliny-timeblock').not('[data-month='+ activeMonth +']').removeClass(visibleEvents);
 
-                    //Hide all inactive years
-                    if( $(this).attr('data-year') !== activeYear){
+
+                $( timeblock ).each(function(  ) {
+                  var thisYear = $(this).attr('data-year');
+                  var thisMonth = $(this).attr('data-month');
+
+                  console.log('ActiveMonth and this Month',  activeMonth,  $(thisMonth));
+
+                  //Reinitializing visibleEvents
+                  if( $(thisMonth) == activeMonth  ){
+                    console.log('remove this unneeded month',  $(thisMonth), activeMonth);
+                    $(this).removeClass('visibleEvent');
+                  }
+
+
+                    //Hide all inactive months
+                    if( $(thisMonth) !== activeMonth){
+                      console.log('hide inactive months...');
                         $(this).hide();
                     }
-                    if( $(this).attr('data-month') !== activeMonth){
-                        $(this).hide();
-                    }
-                    else{
-                        //Add class to current events
-                        $(this).addClass('visibleEvent');
+                    if( $(thisYear) == activeYear && $(thisMonth) == activeMonth){
+                      //Add class to current events
+                      console.log('add visible events to visible weeks...');
+                      $(this).addClass('visibleEvent');
                     }
 
                 });
@@ -327,8 +340,6 @@
                 index = 0;
                 active = $('.timeliny-timeblock.active');
                 dataYear = $(active).attr('data-year');
-                var monthEvents = children.parent().find('[data-year=' + dataYear + ']');
-
                 eventsLog = [];
 
                 eventsLog.length = 0;
@@ -338,11 +349,9 @@
 
                 console.debug('month frames initialized');
 
-                console.log('clear log', eventsLog, monthEvents);
-
+                console.log('clear log', eventsLog);
 
                 var month = $(active).attr('data-month');
-
 
                 $(visibleEvents).each(function(){
                   active = $('.timeliny-timeblock.active');
@@ -367,6 +376,7 @@
                 firstFrame = firstWeek;
                 lastFrame = lastWeek;
                 index = 0;
+                visibleEvents = $('.visibleEvent');
                 dataYear = $('.active').attr('data-year');
                 dataMonth = $('.active').attr('data-month');
 
@@ -377,24 +387,31 @@
 
                 active = $('.timeliny-timeblock.active');
 
-                var weekEvents = $(timeline).find('[data-year= '+ dataYear +'][data-month=' + dataMonth + ']').not(dot);
-
                 eventsLog = [];
 
                 eventsLog.length = 0;
-                console.log('clear log', eventsLog, weekEvents, dataYear, dataMonth);
+                console.log('clear log', eventsLog, dataYear, dataMonth);
 
-                $(weekEvents).each(function(){
+                var week = $(active).attr('data-week');
+
+                $(visibleEvents).each(function(){
+                  active = $('.timeliny-timeblock.active');
+                  dataYear = $(active).attr('data-year');
+                  var week = $(this).attr('data-week');
+
                     console.log('weeks log');
 
-                    //Don't add repeating event weeks to Weeks Timeline.
-                    if( $(this).attr('data-month') !== eventsLog[index - 1]){
-                        console.log('add to list');
+                    //Don't add repeating event months to Months Timeline.
+                    if( $.inArray(week, eventsLog) == -1 ){
+                        console.log('push weeks to log');
 
                         eventsLog.push($(this).attr('data-week'));
                         index++;
                     }
+
                 });
+
+                index= 0;
 
                 console.debug('eventsLog for Weeks', eventsLog);
 
@@ -444,10 +461,10 @@
 
                         if(weeksView === true){
                             console.debug('Adding weeksView ghost frames');
-                            firstFrame = firstWeek;
-                            lastFrame = lastWeek;
 
                             frameType = 'timeliny-week';
+                            firstFrame = firstWeek;
+                            lastFrame = lastWeek;
 
                             prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ (y - 1) +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ y +']').not(dot);
@@ -493,7 +510,7 @@
                             }
                         }
                         else{
-                            console.debug('event exists...', y, index, eventsLog);
+                            console.debug('event exists...', 'y', y, 'index', index, eventsLog);
 
                             $(thisFrame).show();
 
