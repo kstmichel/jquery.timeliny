@@ -118,7 +118,8 @@
 
                 $(timeline).addClass('year-view');
                 $(timeline).removeClass('weeks-view month-view');
-                $(timeblock).removeClass('firstFrame');
+                //Reset classes, markings for extra and initial events
+                $(timeblock).removeClass('firstFrame only_event initial_events extra_events');
                 $(dot).removeClass('clicked');
 
                 //disable the other buttons
@@ -165,7 +166,8 @@
                 $(timeline).removeClass('year-view weeks-view');
                 $(timeline).addClass('month-view');
                 $(extraEvents).removeClass('active');
-                $(timeblock).removeClass('extra_events initial_events');
+                //Reset classes, markings for extra and initial events
+                $(timeblock).removeClass('firstFrame only_event initial_events extra_events');
 
                 $(dot).remove();
                 $(week).remove();
@@ -225,8 +227,8 @@
                 $(timeline).removeClass('year-view month-view');
                 $(timeline).addClass('weeks-view');
 
-                //Remove markings for extra and initial events
-                $(timeblock).removeClass('extra_events initial_events');
+                //Reset classes, markings for extra and initial events
+                $(timeblock).removeClass('firstFrame only_event initial_events extra_events');
 
 
                 //Hide all months
@@ -565,31 +567,15 @@
 
 
                 // Timeline Cleanup
-                if(yearsView === true){
-                    var extraEvents =   $('.timeliny-timeblock.extra_events');
-                    var initialEvent =  $('.timeliny-timeblock.initial_events');
+                var activeExtra =   $('.timeliny-timeblock.extra_events.active');
+                var activeYear =   $(activeExtra).attr('data-year');
 
-                    //Remove Month Classes and reset active class
-                    $(extraEvents).each(function(){
+                console.debug("timeline cleanup");
 
-                        console.debug('extraEvents...removed month attributes',  dataYear, dataMonth);
+                 //Remove Month Classes and reset active class
+                $('.initial_events[data-year=' + activeYear +']').addClass('active');
+                $(activeExtra).removeClass('active');
 
-                        if( $(this).attr('data-year') == dataYear ){
-                            $(this).first().addClass('active');
-                        }
-                    });
-
-                    //Remove Month Classes and reset active class
-                    $(initialEvent).each(function(){
-
-                        console.debug('initialEvents....',  dataYear, dataMonth);
-
-                        if( $(this).attr('data-year') == dataYear ){
-                            $(this).addClass('active');
-                        }
-                    });
-
-                }
 
                 _createDots();
 		}
@@ -661,7 +647,7 @@
 			var activeDotPos = $el.find('.' + options.className + '-timeblock.active').position().left;
 			var dotRadius = $el.find('.' + options.className + '-timeblock.active .' + options.className + '-dot').width() / 2;
 
-console.log('timeblock active where are you', $('.timeliny-timeblock.active'));
+            console.log('timeblock active where are you', $('.timeliny-timeblock.active'));
 
 			var diff = activeDotPos - linePos;
 			var left;
