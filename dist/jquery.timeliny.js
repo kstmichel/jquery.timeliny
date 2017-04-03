@@ -484,7 +484,6 @@
                 dataMonth = $(active).attr('data-month');
                 dataWeek = $(active).attr('data-week');
                 dataDay = $(active).attr('data-day');
-                var timestamp = dataDay + '-' + dataMonth + '-' + dataYear;
                 toggleVisible = $('.visibleEvent');
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +']');
                 hiddenEvents = $('.timeliny-timeblock:not([data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'])');
@@ -498,12 +497,23 @@
 
                 var totalDays = getDaysInMonth(dataMonth, dataYear);
 
-                var curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
-                var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-                var last = first + 6; // last day is the first day + 6
-                firstDay = new Date(curr.setDate(first)); // 06-Jul-2014
-                lastDay = new Date(curr.setDate(last)); //12-Jul-2014
 
+                if( dataWeek === 1){
+                    firstDay = 1;
+                    lastDay =  7;
+                }
+                if( dataWeek === 2){
+                    firstDay = 1;
+                    lastDay =  7;
+                }
+                if( dataWeek === 3){
+                    firstDay = 1;
+                    lastDay =  7;
+                }
+                if( dataWeek === 4){
+                    firstDay = 1;
+                    lastDay =  totalDays;
+                }
 
                 // if( dataWeek === 1){
                 //     firstDay = 1;
