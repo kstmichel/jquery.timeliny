@@ -29,9 +29,11 @@
 
 			// _reorderElems();
 			if (options.hideBlankYears === false) {
+
                 _addGhostElems();
+
             }
-      _granularity();
+             _granularity();
 			_createWrapper();
 			_createDots();
 			_fixBlockSizes();
@@ -59,7 +61,11 @@
 			$el.append(children);
 		}
 
-		/**
+
+
+
+
+        /**
 		 * Plugin is loaded
 		 * @private
 		 */
@@ -73,11 +79,11 @@
 
 
 			var currYear = $el.find('.' + options.className + '-timeblock.active').first().attr('data-year');
-      var currMonth = $el.find('.' + options.className + '-timeblock.active').first().attr('data-month');
-      var currWeek = $el.find('.' + options.className + '-timeblock.active').first().attr('data-week');
+            var currMonth = $el.find('.' + options.className + '-timeblock.active').first().attr('data-month');
+            var currWeek = $el.find('.' + options.className + '-timeblock.active').first().attr('data-week');
 
 
-      console.log('curr mark', currYear, currMonth, currWeek);
+            console.log('curr mark', currYear, currMonth, currWeek);
 			hook('afterLoad', [currYear, currMonth, currWeek]);
             _updateTimelinePos();
 
@@ -298,30 +304,6 @@
 
                 console.log('actives', activeYear, activeMonth,  activeWeek);
 
-                // $( timeblock ).each(function(  ) {
-                //     var thisYear = $(this).attr('data-year');
-                //     var thisMonth = $(this).attr('data-month');
-                //
-                //     console.log('ActiveMonth and this Month',  activeMonth,  $(thisMonth));
-                //
-                //     // //Reinitializing visibleEvents
-                //     if( $(thisMonth) == activeMonth && $(thisMonth) == activeYear  ){
-                //         // console.log('remove this unneeded month',  $(thisMonth), activeMonth);
-                //         $(this).removeClass('visibleEvent');
-                //     }
-                //
-                //     //Hide all inactive months
-                //     if( $(thisMonth) !== activeMonth){
-                //         // console.log('hide inactive months...');
-                //         $(this).hide();
-                //     }
-                //     if( $(thisYear) == activeYear && $(thisMonth) == activeMonth){
-                //         //Add class to current events
-                //         // console.log('add visible events to visible weeks...');
-                //         $(this).addClass('visibleEvent');
-                //     }
-                //
-                // });
 
                 _addGhostElems();
                 _updateTimelinePos();
@@ -363,6 +345,9 @@
             var visibleEvents;
             var hiddenEvents;
             var search;
+            var newY;
+            var newYprev;
+
 
             if(yearsView === true){
                 var firstYear = 	2008;
@@ -400,7 +385,7 @@
             }
 
             if(monthsView === true){
-                var firstMonth = 	1;
+                var firstMonth = 	'01';
                 var lastMonth = 	12;
                 firstFrame = firstMonth;
                 lastFrame = lastMonth;
@@ -437,10 +422,6 @@
             }
 
             if(weeksView === true){
-                var firstWeek = 1;
-                var lastWeek =  4;
-                firstFrame = firstWeek;
-                lastFrame = lastWeek;
                 index = 0;
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +']');
                 console.debug('Setting up weeks datalog');
@@ -454,6 +435,43 @@
                 console.log('clear log', eventsLog, dataYear, dataMonth);
 
                 var week = $(active).attr('data-week');
+
+                curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
+
+                //Sunday of the selected week events
+                var sundayZeroIndex = dataDay; // 0 : Sunday ,1 : Monday,2,3,4,5,6 : Saturday
+                var sundayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()-7);
+                var saturdayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()+6);
+
+                firstDay = sundayOfWeek.getDay();
+                lastDay =  saturdayOfWeek.getDay();
+
+                thisYear = dataYear;
+                thisMonth = dataMonth;
+
+                saturdays = [];
+                sundays = [];
+
+                for (var i = 0; i <= new Date(thisYear, thisMonth, 0).getDate(); i++)
+                {
+                    date = new Date(thisYear, thisMonth, i);
+
+                    if (date.getDay() == 6)
+                    {
+                        saturdays.push(i);
+                    }
+                    else if (date.getDay() == 0)
+                    {
+                        sundays.push(i);
+                    }
+                }
+
+                console.debug('SUNDAYS', sundays, thisMonth, thisYear );
+                var firstWeek = 1;
+                var lastWeek =  $(sundays).length;
+                firstFrame = firstWeek;
+                lastFrame = lastWeek;
+
 
                 $(visibleEvents).each(function(){
                   var week = $(this).attr('data-week');
@@ -484,7 +502,6 @@
                 dataMonth = $(active).attr('data-month');
                 dataWeek = $(active).attr('data-week');
                 dataDay = $(active).attr('data-day');
-                var timestamp = dataDay + '-' + dataMonth + '-' + dataYear;
                 toggleVisible = $('.visibleEvent');
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +']');
                 hiddenEvents = $('.timeliny-timeblock:not([data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'])');
@@ -496,40 +513,50 @@
                     return new Date(year, month, 0).getDate();
                 };
 
-                var totalDays = getDaysInMonth(dataMonth, dataYear);
-
                 var curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
-                var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-                var last = first + 6; // last day is the first day + 6
-                firstDay = new Date(curr.setDate(first)); // 06-Jul-2014
-                lastDay = new Date(curr.setDate(last)); //12-Jul-2014
+
+                //Sunday of the selected week events
+                sundayZeroIndex = dataDay; // 0 : Sunday ,1 : Monday,2,3,4,5,6 : Saturday
+                sundayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()-7);
+                saturdayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()+6);
 
 
-                // if( dataWeek === 1){
-                //     firstDay = 1;
-                //     lastDay =  7;
-                // }
-                // if( dataWeek === 2){
-                //     firstDay = 8;
-                //     lastDay =  14;
-                // }
-                // if( dataWeek === 3){
-                //     firstDay = 15;
-                //     lastDay =  21;
-                // }
-                // if( dataWeek === 4){
-                //     firstDay = 21;
-                //     lastDay =  totalDays;
-                // }
-                //
-                // firstDay = 1;
-                // lastDay =  7;
+                firstDay = sundayOfWeek.getDay();
+                lastDay = saturdayOfWeek.getDay();
+
+
+                // var my_date = curr.split('-');
+                var thisYear = dataYear;
+                var thisMonth = dataMonth;
+
+                var saturdays = [];
+                var sundays = [];
+
+                for (var i = 0; i <= new Date(thisYear, thisMonth, 0).getDate(); i++)
+                {
+                    var date = new Date(thisYear, thisMonth, i);
+
+                    if (date.getDay() == 6)
+                    {
+                        saturdays.push(date);
+                    }
+                    else if (date.getDay() == 0)
+                    {
+                        sundays.push(date);
+                    }
+                };
+
+
+                console.log('DAYS SUNDAYS + SAT', sundays, saturdays);
+
+
+                console.debug('Sunday', 'Current Day', sundayZeroIndex, 'Saturday');
 
                 firstFrame = firstDay;
                 lastFrame = lastDay;
 
 
-                console.debug('Amount of Days in Month:',  totalDays, 'year/month', dataYear, dataMonth , 'FIRST LAST', firstDay, lastDay, 'TIMESTAMP',timestamp );
+                // console.debug('Amount of Days in Month:',  totalDays, 'year/month', dataYear, dataMonth , 'FIRST LAST', firstDay, lastDay, 'TIMESTAMP',timestamp );
 
 
                 //disable the years button
@@ -571,25 +598,24 @@
                 if (options.order === 'asc') {
                     console.debug('ascending list---STATS', firstFrame, lastFrame);
 
-                    var begin = firstFrame;
-                    var end = lastFrame;
 
                     // Variable y is the granularity timeframe (years, months, weeks, days, hours), continue up through.
-                    for (var y = (('0' + begin).slice(-2)); y < ('0' + end).slice(-2) + 1; y++) {
+                    for (var y = firstFrame; y < lastFrame + 1; y++){
                         dataYear = $(active).attr('data-year');
                         dataMonth = $(active).attr('data-month');
 
-                        console.debug('dataMonth',dataMonth, 'y', y );
 
                         if(yearsView === true){
                             console.log('Adding yearsView ghost frames');
+
+                            newY = y;
 
                             frameType = 'timeliny-year';
                             prevFrame = children.parent().parent().find('[data-year='+ (y - 1) +']').not(dot);
                             nextFrame = children.parent().parent().find('[data-year='+ (y + 1) +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ y +']').not(dot);
 
-                            ghostFrame = '<div data-year="' + y + '" data-month="1" class="inactive inactive-year">'+y+' ghost frame</div>';
+                            ghostFrame = '<div data-year="' + newY + '" data-month="01" class="inactive inactive-year">'+newY+' ghost frame</div>';
 
                             children = $el.children();
                         }
@@ -598,13 +624,22 @@
                             console.log('Adding monthsView ghost frames');
 
                             frameType = 'timeliny-month';
-                            firstFrame = firstMonth;
-                            lastFrame = lastMonth;
+                            // firstFrame = firstMonth;
+                            // lastFrame = lastMonth;
+
+                            //Adjust Y into a two digit number
+                            newY = ('0' + y).slice(-2);
+                            newYprev = ('0' + (y - 1)).slice(-2);
+                            console.log('newY', newY, 'Y', y);
 
                             search = '[data-year="' + dataYear + '"]';
-                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ (y - 1) +']').not(dot);
-                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ y +']').not(dot);
-                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + ('0' + y).slice(-2) + '" class="inactive inactive-month">'+y+' ghost frame</div>';
+                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ newYprev +']').not(dot);
+                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ newY +']').not(dot);
+
+
+                            console.log('what is newY - 1?', (newY - 1));
+
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + newY + '" class="inactive inactive-month">'+newY+' ghost frame</div>';
 
                         }
 
@@ -612,13 +647,32 @@
                             console.debug('Adding weeksView ghost frames');
 
                             frameType = 'timeliny-week';
-                            firstFrame = firstWeek;
-                            lastFrame = lastWeek;
+
+                            //Adjust Y into a two digit number
+                            // newY = sundays[y];
+                            newYprev = ('0' + (y - 1)).slice(-2);
+                            console.log('newY', newY, 'Y', y);
+
+
+
+                            // get week number from day month year value
+
+                            // curr = new Date( dataMonth + '-' + dataDay + '-' + dataYear ); // get current date
+                            // var first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+                            // var last = first + 6; // last day is the first day + 6
+                            // firstDay = new Date(curr.setDate(first)); // 06-Jul-2014
+                            // lastDay = new Date(curr.setDate(last)); //12-Jul-2014
+
+
+
+
+                            // console.debug("current", curr, 'first', first, 'last', last, 'first Day', firstDay, 'last day', lastDay, 'day', dataDay, 'month', dataMonth, 'year', dataYear);
+
 
                             search = '[data-year="' + dataYear + '"][data-month="' + dataMonth + '"]';
-                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ (y - 1) +']').not(dot);
-                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ y +']').not(dot);
-                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + y + '" class="inactive inactive-week">'+y+' ghost frame</div>';
+                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ newYprev +']').not(dot);
+                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ newY +']').not(dot);
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + sundays[y] + '" class="inactive inactive-week">'+newY+' ghost frame</div>';
 
                         }
 
@@ -626,28 +680,37 @@
                             console.debug('Adding daysView ghost frames');
 
                             frameType = 'timeliny-day';
-                            firstFrame = firstDay;
-                            lastFrame = lastDay;
+                            // firstFrame = firstDay;
+                            // lastFrame = lastDay;
+
+                            //Adjust Y into a two digit number
+                            newY = ('0' + y).slice(-2);
+                            newYprev = ('0' + (y - 1)).slice(-2);
+                            console.log('newY', newY, 'Y', y);
 
                             search = '[data-year="' + dataYear + '"][data-month="' + dataMonth + '"][data-week="' + dataWeek + '"]';
-                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ (y - 1) +']').not(dot);
-                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ y +']').not(dot);
-                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + dataWeek + '" data-day="' + y + '" class="inactive inactive-day">'+y+' ghost frame</div>';
+                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ newYprev +']').not(dot);
+                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ newY +']').not(dot);
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + dataWeek + '" data-day="' + newY + '" class="inactive inactive-day">'+newY+' ghost frame</div>';
 
                         }
+
+
+                        console.log('dataMonth',dataMonth );
+
 
                         //if the event doesn't exist...
                         if ( $(thisFrame).length <= 0 ) {
                             console.log('not detecting event...');
 
                             // if y is greater than firstFrame, place ghost item after event
-                            if (y > firstFrame) {
-                                console.log('y is > than firstFrame', y, firstFrame);
+                            if (newY > firstFrame) {
+                                console.debug('y is > than firstFrame', newY, firstFrame);
                                $(prevFrame).last().after(ghostFrame);
 
                                 //if y is less than firstFrame, place ghost frame as first item
                             } else {
-                                console.log('y is firstFrame', y, firstFrame);
+                                console.debug('y is firstFrame', newY, firstFrame);
                                 //add class to ghost events
 
                                 console.debug('PLACEMENT...');
@@ -665,16 +728,16 @@
                             }
                         }
                         else{
-                            console.debug('event exists...', y);
+                            console.debug('event exists...', newY);
 
                             $(thisFrame).show();
 
                             //If y is equal to event, don't print ghost frame
-                            if (y == eventsLog[index]) {
+                            if (newY == eventsLog[index]) {
 
                                 $(thisFrame).addClass('visibleEvent');
 
-                                console.debug('y Equal to EventLog, print no frame', y, '===', eventsLog[index], index);
+                                console.debug('y Equal to EventLog, print no frame', newY, '===', eventsLog[index], index);
 
                                 //Change link to event attribute instead of data-year
                                 console.debug('Mark extra events');
@@ -695,21 +758,36 @@
                                 else{
                                     console.debug('has only_event');
                                 }
+
+
+                                //If this is today, add active class
+                                var today = new Date();
+                                var todayYear = today.getFullYear();
+
+                                var thisYear = $(thisFrame).attr('data-year');
+
+                                console.debug('TODAY', today, 'TODAY YEAR', thisYear, todayYear);
+
+                                if( thisYear == todayYear){
+                                    $(thisFrame).addClass('active');
+                                }
+
+
                             }
-						              }
+					 }
                     }
 
                     //If timeline is in descending order...
                 } else {
 
                     // Variable y is firstYear (2008), continue down through years if y is less than lastYear (2019)
-                    for (var y = firstFrame; y >= lastFrame; y--) {
+                    for (var newY = firstFrame; newY >= lastFrame; newY--) {
 
                         //if the event doesn't exist...
                         if ( $(thisFrame).length <= 0 ) {
 
                             // if event is less than firstFrame, place ghost item after
-                            if (y < firstYear) {
+                            if (newY < firstYear) {
                                 $(nextFrame).after(ghostFrame);
                             }
                             //if event is greater than firstFrame, place ghost frame as first item

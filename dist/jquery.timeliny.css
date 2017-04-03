@@ -73,7 +73,7 @@
       -webkit-transition: all 0.35s ease-in-out;
       -moz-transition: all 0.35s ease-in-out;
       transition: all 0.35s ease-in-out;
-      content: ' Week ' attr(data-week)  ' \A  ' attr(data-month) ' / ' attr(data-year) ;
+      content: 'Week Starting '  ' \A  ' attr(data-month) ' / ' attr(data-week) ' / '  attr(data-year) ;
       display: block;
       white-space: pre;
       position: absolute;
@@ -85,7 +85,7 @@
     -webkit-transition: all 0.35s ease-in-out;
     -moz-transition: all 0.35s ease-in-out;
     transition: all 0.35s ease-in-out;
-    content: attr(data-day)  '/' attr(data-month) '/' attr(data-year) ;
+    content: attr(data-month) '/' attr(data-day)  '/' attr(data-year) ;
     display: block;
     white-space: pre;
     position: absolute;
