@@ -395,7 +395,7 @@
 
                 index = 0;
 
-                console.debug('eventsLog for Years', eventsLog);
+                console.debug('eventsLog for Years', eventsLog, firstFrame, lastFrame);
 
             }
 
@@ -571,12 +571,15 @@
                 if (options.order === 'asc') {
                     console.debug('ascending list---STATS', firstFrame, lastFrame);
 
-                    // Variable y is firstYear (2008), continue up through years if y is less than lastYear (2019)
-                    for (var y = firstFrame; y < lastFrame + 1; y++) {
+                    var begin = firstFrame;
+                    var end = lastFrame;
+
+                    // Variable y is the granularity timeframe (years, months, weeks, days, hours), continue up through.
+                    for (var y = (('0' + begin).slice(-2)); y < ('0' + end).slice(-2) + 1; y++) {
                         dataYear = $(active).attr('data-year');
                         dataMonth = $(active).attr('data-month');
 
-                        // console.debug('trigger loop', y, firstFrame, lastFrame);
+                        console.debug('dataMonth',dataMonth, 'y', y );
 
                         if(yearsView === true){
                             console.log('Adding yearsView ghost frames');
@@ -601,7 +604,7 @@
                             search = '[data-year="' + dataYear + '"]';
                             prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ (y - 1) +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ y +']').not(dot);
-                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + y + '" class="inactive inactive-month">'+y+' ghost frame</div>';
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + ('0' + y).slice(-2) + '" class="inactive inactive-month">'+y+' ghost frame</div>';
 
                         }
 
