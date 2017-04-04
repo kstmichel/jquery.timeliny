@@ -334,7 +334,7 @@
 
             var index;
             var frameType;
-			var firstFrame;
+			      var firstFrame;
             var lastFrame;
             var thisFrame;
             var eventsLog;
@@ -447,31 +447,39 @@
                 lastDay =  saturdayOfWeek.getDay();
 
                 thisYear = dataYear;
-                thisMonth = dataMonth;
+                thisMonth = Number(dataMonth).toString();
+                var adjustMonth = dataMonth--;
+
+                console.debug("figre this out", dataMonth, thisMonth, adjustMonth, thisYear, firstFrame, lastFrame );
 
                 saturdays = [];
                 sundays = [];
 
-                for (var i = 0; i <= new Date(thisYear, thisMonth, 0).getDate(); i++)
+                for (var i = 0; i <= new Date(thisYear, dataMonth  , 0).getDate(); i++)
                 {
-                    date = new Date(thisYear, thisMonth, i);
+                    date = new Date(thisYear, dataMonth, i);
+
 
                     if (date.getDay() == 6)
                     {
-                        saturdays.push(i);
+                        console.log('date', date);
+                        saturdays.push(('0' + i).slice(-2));
+
                     }
                     else if (date.getDay() == 0)
                     {
-                        sundays.push(i);
+                        console.log('date', date);
+                        sundays.push(('0' + i).slice(-2));
+
                     }
                 }
 
-                console.debug('SUNDAYS', sundays, thisMonth, thisYear );
-                var firstWeek = 1;
+
+                var firstWeek = 0;
                 var lastWeek =  $(sundays).length;
                 firstFrame = firstWeek;
                 lastFrame = lastWeek;
-
+                console.debug('SUNDAYS', sundays, thisMonth, thisYear, firstFrame, lastFrame );
 
                 $(visibleEvents).each(function(){
                   var week = $(this).attr('data-week');
@@ -649,7 +657,7 @@
                             frameType = 'timeliny-week';
 
                             //Adjust Y into a two digit number
-                            // newY = sundays[y];
+                              newY = ('0' + y).slice(-2);
                             newYprev = ('0' + (y - 1)).slice(-2);
                             console.log('newY', newY, 'Y', y);
 
@@ -670,8 +678,11 @@
 
 
                             search = '[data-year="' + dataYear + '"][data-month="' + dataMonth + '"]';
+
                             prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ newYprev +']').not(dot);
+
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ newY +']').not(dot);
+
                             ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + sundays[y] + '" class="inactive inactive-week">'+newY+' ghost frame</div>';
 
                         }
