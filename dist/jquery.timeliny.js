@@ -142,6 +142,7 @@
                 $(week).remove();
                 $(year).show();
 
+
                 $(visibleYears).addClass('visibleEvent');
 
                 _addGhostElems();
@@ -324,17 +325,19 @@
             var timeline  = 	$('.timeliny-timeline');
             var timeblock  =	$('.timeliny-timeblock');
             var dot  = 			$('.timeliny-dot');
-            var active =    	$('.timeliny-timeblock.active');
+            active =    	$('.active');
+            // var active =        children.parent().parent().find('.active');
 
 
-            var dataYear = $(active).attr('data-year');
-            var dataMonth = $(active).attr('data-month');
-            var dataWeek = $(active).attr('data-month');
-            var dataDay = $(active).attr('data-day');
+           dataYear = $(active).attr('data-year');
+            dataMonth = $(active).attr('data-month');
+            dataDay = $(active).attr('data-day');
+
+            console.debug('time variables', dataMonth, dataDay, dataYear, 'active', active);
 
             var index;
             var frameType;
-			      var firstFrame;
+			var firstFrame;
             var lastFrame;
             var thisFrame;
             var eventsLog;
@@ -385,8 +388,8 @@
             }
 
             if(monthsView === true){
-                var firstMonth = 	'01';
-                var lastMonth = 	12;
+                var firstMonth = 	1;
+                var lastMonth = 	13;
                 firstFrame = firstMonth;
                 lastFrame = lastMonth;
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +']');
@@ -422,9 +425,17 @@
             }
 
             if(weeksView === true){
+                var active =    $('.active');
+                var dataYear = $(active).attr('data-year');
+                var dataMonth = $(active).attr('data-month');
+                var dataDay = $(active).attr('data-day');
+                // var dataWeek = $(active).attr('data-week');
+
                 index = 0;
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +']');
-                console.debug('Setting up weeks datalog');
+                console.debug('Setting up weeks datalog', dataYear, dataMonth);
+
+
 
                 //disable the years button
                 $(weeksBtn).attr("disabled", true);
@@ -434,57 +445,68 @@
                 eventsLog.length = 0;
                 console.log('clear log', eventsLog, dataYear, dataMonth);
 
-                var week = $(active).attr('data-week');
 
-                curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
+                // curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
 
-                //Sunday of the selected week events
-                var sundayZeroIndex = dataDay; // 0 : Sunday ,1 : Monday,2,3,4,5,6 : Saturday
-                var sundayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()-7);
-                var saturdayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()+6);
 
-                firstDay = sundayOfWeek.getDay();
-                lastDay =  saturdayOfWeek.getDay();
+                //Find out how many days are in this month
+                //Month is 1 based
+                var getDaysInMonth = function(month,year) {
+                    return new Date(year, month, 0).getDate();
+                };
 
                 thisYear = dataYear;
                 thisMonth = Number(dataMonth).toString();
-                var adjustMonth = dataMonth--;
-
-                console.debug("figre this out", dataMonth, thisMonth, adjustMonth, thisYear, firstFrame, lastFrame );
-
-                saturdays = [];
-                sundays = [];
-
-                for (var i = 0; i <= new Date(thisYear, dataMonth  , 0).getDate(); i++)
-                {
-                    date = new Date(thisYear, dataMonth, i);
 
 
-                    if (date.getDay() == 6)
-                    {
-                        console.log('date', date);
-                        saturdays.push(('0' + i).slice(-2));
+                var weeks = [];
+                firstDay = 1;
+                lastDay =  getDaysInMonth(dataMonth, dataYear);
 
-                    }
-                    else if (date.getDay() == 0)
-                    {
-                        console.log('date', date);
-                        sundays.push(('0' + i).slice(-2));
-
-                    }
+                // push every 7 days to array
+                for(var w = firstDay; w < lastDay; w += 7){
+                    weeks.push(('0' + w).slice(-2));
                 }
 
+                console.debug('WEEKS', weeks);
 
-                var firstWeek = 0;
-                var lastWeek =  $(sundays).length;
+                // What week does active event fall under? Look at days...
+                // Push this week number to the events log.
+
+
+                //If dataDay is a value in Weeks array...
+                for (i = 0; i < weeks.length; ++i) {
+                   if( dataDay > weeks[i] && dataDay < weeks[i+1]){
+                       $(active).attr('data-week', weeks[i]);
+
+                       console.log('CREATE ACTIVE DATA-WEEK', $(active) );
+                   }
+
+                }
+                //
+                // if( $.inArray(dataDay, weeks) > -1 ){
+                //     console.log('push weeks to log');
+                //
+                //     //Add dataWeek attribute to active frame
+                //     $(active).attr('data-week', weeks[i]);
+                //
+                //     index++;
+                // }
+                // // Check which value dataDay is bigger than...
+                // if(){
+                //
+                // }
+
+                var firstWeek = weeks[0];
+                var lastWeek = weeks[weeks.length-1];
                 firstFrame = firstWeek;
                 lastFrame = lastWeek;
-                console.debug('SUNDAYS', sundays, thisMonth, thisYear, firstFrame, lastFrame );
+                console.debug('frames', 'thisMonth', thisMonth, 'thisYear', thisYear, 'firstFrame', firstFrame, 'lastFrame', lastFrame );
 
                 $(visibleEvents).each(function(){
                   var week = $(this).attr('data-week');
 
-                    console.log('weeks log');
+                    console.log('weeks log', week);
 
                     //Don't add repeating event months to Months Timeline.
                     if( $.inArray(week, eventsLog) == -1 ){
@@ -508,7 +530,7 @@
                 index = 0;
                 dataYear = $(active).attr('data-year');
                 dataMonth = $(active).attr('data-month');
-                dataWeek = $(active).attr('data-week');
+                // dataWeek = $(active).attr('data-week');
                 dataDay = $(active).attr('data-day');
                 toggleVisible = $('.visibleEvent');
                 visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +']');
@@ -516,21 +538,16 @@
                 console.debug('Setting up days datalog');
 
 
-                //Find out how many days are in this month
-                var getDaysInMonth = function(month,year) {
-                    return new Date(year, month, 0).getDate();
-                };
-
                 var curr = new Date(dataDay + '-' + dataMonth + '-' + dataYear ); // get current date
 
                 //Sunday of the selected week events
-                sundayZeroIndex = dataDay; // 0 : Sunday ,1 : Monday,2,3,4,5,6 : Saturday
-                sundayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()-7);
-                saturdayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()+6);
+                // sundayZeroIndex = dataDay; // 0 : Sunday ,1 : Monday,2,3,4,5,6 : Saturday
+                // sundayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()-7);
+                // saturdayOfWeek = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - curr.getDay()+6);
+                //
 
-
-                firstDay = sundayOfWeek.getDay();
-                lastDay = saturdayOfWeek.getDay();
+                // firstDay = sundayOfWeek.getDay();
+                // lastDay = saturdayOfWeek.getDay();
 
 
                 // var my_date = curr.split('-');
@@ -552,7 +569,7 @@
                     {
                         sundays.push(date);
                     }
-                };
+                }
 
 
                 console.log('DAYS SUNDAYS + SAT', sundays, saturdays);
@@ -573,7 +590,7 @@
                 eventsLog = [];
 
                 eventsLog.length = 0;
-                console.log('clear log', eventsLog, active, dataYear, dataMonth, dataWeek, dataDay);
+                console.log('clear log', eventsLog, active, dataYear, dataMonth, dataDay);
 
                 $(toggleVisible).removeClass('visibleEvent');
 
@@ -604,11 +621,11 @@
             }
 
                 if (options.order === 'asc') {
-                    console.debug('ascending list---STATS', firstFrame, lastFrame);
+                    console.debug('ascending list---STATS', firstFrame, lastFrame,'dataMonth', dataMonth);
 
 
                     // Variable y is the granularity timeframe (years, months, weeks, days, hours), continue up through.
-                    for (var y = firstFrame; y < lastFrame + 1; y++){
+                    for (var y = firstFrame; y < lastFrame; y++){
                         dataYear = $(active).attr('data-year');
                         dataMonth = $(active).attr('data-month');
 
@@ -625,6 +642,19 @@
 
                             ghostFrame = '<div data-year="' + newY + '" data-month="01" class="inactive inactive-year">'+newY+' ghost frame</div>';
 
+
+                            //If this is TODAY and active doesn't exist already, add active class
+                            var today = new Date();
+                            var todayYear = today.getFullYear();
+
+                            thisYear = $(thisFrame).attr('data-year');
+
+                            console.debug('TODAY', today, 'TODAY YEAR', thisYear, todayYear);
+
+                            if( thisYear == todayYear && !$('.active').length){
+                                $(thisFrame).addClass('active today');
+                            }
+
                             children = $el.children();
                         }
 
@@ -632,8 +662,6 @@
                             console.log('Adding monthsView ghost frames');
 
                             frameType = 'timeliny-month';
-                            // firstFrame = firstMonth;
-                            // lastFrame = lastMonth;
 
                             //Adjust Y into a two digit number
                             newY = ('0' + y).slice(-2);
@@ -645,10 +673,21 @@
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ newY +']').not(dot);
 
 
-                            console.log('what is newY - 1?', (newY - 1));
-
                             ghostFrame = '<div data-year="' + dataYear + '" data-month="' + newY + '" class="inactive inactive-month">'+newY+' ghost frame</div>';
 
+                            //If this is TODAY, add active class
+                            today = new Date();
+                            var todayMonth = today.getMonth();
+
+                            thisMonth = $(thisFrame).attr('data-month');
+
+                            console.debug('TODAY', today, 'TODAY MONTH', thisMonth, todayMonth);
+
+                            if( thisMonth == todayMonth){
+                                $(thisFrame).addClass('active today');
+                            }
+
+                            children = $el.children();
                         }
 
                         if(weeksView === true){
@@ -656,12 +695,24 @@
 
                             frameType = 'timeliny-week';
 
-                            //Adjust Y into a two digit number
-                              newY = ('0' + y).slice(-2);
-                            newYprev = ('0' + (y - 1)).slice(-2);
-                            console.log('newY', newY, 'Y', y);
+                            // If we are pass the first loop, have y count by 7's and turn into a two digit number
+                                var weeksY = weeks[y-1];
+                                newY = ('0' + weeksY).slice(-2);
+                                newYprev = ('0' + (weeks[y-2])).slice(-2);
+                                console.log('EACH FRAME LOOP: y', y, 'weeksY', weeksY, 'newY', newY, 'newYprev', newYprev);
+
+                                if(typeof(weeksY) === 'undefined'){
+
+                                    console.debug('WARNING....UNDEFINED');
+                                    break; // breaks out of loop completely
+                                }
 
 
+                            console.log('EACH FRAME LOOP: days in this month', getDaysInMonth(dataMonth, dataYear));
+
+
+                            // count up by 7's reassigning firstFrame and lastFrame until you reach total days in month
+                            // if()
 
                             // get week number from day month year value
 
@@ -670,8 +721,6 @@
                             // var last = first + 6; // last day is the first day + 6
                             // firstDay = new Date(curr.setDate(first)); // 06-Jul-2014
                             // lastDay = new Date(curr.setDate(last)); //12-Jul-2014
-
-
 
 
                             // console.debug("current", curr, 'first', first, 'last', last, 'first Day', firstDay, 'last day', lastDay, 'day', dataDay, 'month', dataMonth, 'year', dataYear);
@@ -683,7 +732,7 @@
 
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ newY +']').not(dot);
 
-                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + sundays[y] + '" class="inactive inactive-week">'+newY+' ghost frame</div>';
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + newY + '" class="inactive inactive-week">'+newY+' ghost frame</div>';
 
                         }
 
@@ -707,7 +756,6 @@
                         }
 
 
-                        console.log('dataMonth',dataMonth );
 
 
                         //if the event doesn't exist...
@@ -716,12 +764,14 @@
 
                             // if y is greater than firstFrame, place ghost item after event
                             if (newY > firstFrame) {
-                                console.debug('y is > than firstFrame', newY, firstFrame);
+                                console.debug('newY is > than firstFrame', newY, firstFrame);
                                $(prevFrame).last().after(ghostFrame);
+
+                                console.debug('place ghost after prevFrame', $(prevFrame), ghostFrame);
 
                                 //if y is less than firstFrame, place ghost frame as first item
                             } else {
-                                console.debug('y is firstFrame', newY, firstFrame);
+                                console.debug('newY is firstFrame', newY, firstFrame);
                                 //add class to ghost events
 
                                 console.debug('PLACEMENT...');
@@ -771,17 +821,15 @@
                                 }
 
 
-                                //If this is today, add active class
-                                var today = new Date();
-                                var todayYear = today.getFullYear();
-
-                                var thisYear = $(thisFrame).attr('data-year');
-
-                                console.debug('TODAY', today, 'TODAY YEAR', thisYear, todayYear);
-
-                                if( thisYear == todayYear){
-                                    $(thisFrame).addClass('active');
+                                if(weeksView == true){
+                                    if(newY >= 29){
+                                        break;
+                                    }
+                                    $(thisFrame).attr('data-week', newY);
                                 }
+
+
+
 
 
                             }
@@ -792,7 +840,7 @@
                 } else {
 
                     // Variable y is firstYear (2008), continue down through years if y is less than lastYear (2019)
-                    for (var newY = firstFrame; newY >= lastFrame; newY--) {
+                    for (var x = firstFrame; x >= lastFrame; x--) {
 
                         //if the event doesn't exist...
                         if ( $(thisFrame).length <= 0 ) {
