@@ -93,6 +93,18 @@
     left: 1.25rem;
     width: 100px;
     color: #000; }
+.timeliny .hours-view .timeliny-dot::before {
+  -webkit-transition: all 0.35s ease-in-out;
+  -moz-transition: all 0.35s ease-in-out;
+  transition: all 0.35s ease-in-out;
+  content:  attr(data-hour) ':00'  ' \A  ' attr(data-month) '/' attr(data-day)  '/' attr(data-year) ;
+  display: block;
+  white-space: pre;
+  position: absolute;
+  top: -5rem;
+  left: 1.25rem;
+  width: 100px;
+  color: #000; }
     .timeliny .timeliny-dot::after {
       -webkit-transition: all 0.35s ease-in-out;
       -moz-transition: all 0.35s ease-in-out;

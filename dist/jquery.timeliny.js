@@ -100,6 +100,7 @@
         var monthsView = false;
         var weeksView = false;
         var daysView = false;
+        var hoursView = false;
 
         function _granularity(  ) {
             console.debug('_granularity ENTER');
@@ -109,6 +110,7 @@
             var monthsBtn = $('.granularity-months');
             var weeksBtn = $('.granularity-weeks');
             var daysBtn = $('.granularity-days');
+            var hoursBtn = $('.granularity-hours');
 
             $(yearsBtn).click( function(){
                 var timeline = $('.timeliny-timeline');
@@ -126,10 +128,11 @@
                 monthsView = false;
                 weeksView = false;
                 daysView = false;
+                hoursView = false;
 
                 //Switch timeline classes
                 $(timeline).addClass('year-view');
-                $(timeline).removeClass('month-view weeks-view days-view');
+                $(timeline).removeClass('month-view weeks-view days-view hours-view');
 
                 //Reset classes, markings for extra and initial events
                 $(timeblock).removeClass(' only_event initial_events extra_events');
@@ -139,6 +142,7 @@
                 $(monthsBtn).attr("disabled", false);
                 $(weeksBtn).attr("disabled", false);
                 $(daysBtn).attr("disabled", false);
+                $(hoursBtn).attr("disabled", false);
 
                 //Hide all months/weeks
                 $(month).remove();
@@ -166,6 +170,7 @@
                 monthsView = true;
                 weeksView = false;
                 daysView = false;
+                hoursView = false;
 
                 console.debug('months button clicked ~!~!~!~!~!~!~!~!~!~!~!~');
 
@@ -173,8 +178,9 @@
                 $(yearsBtn).attr("disabled", false);
                 $(weeksBtn).attr("disabled", false);
                 $(daysBtn).attr("disabled", false);
+                $(hoursBtn).attr("disabled", false);
 
-                $(timeline).removeClass('year-view weeks-view days-view');
+                $(timeline).removeClass('year-view weeks-view days-view hours-view');
                 $(timeline).addClass('month-view');
                 $(extraEvents).removeClass('active');
 
@@ -231,14 +237,16 @@
                 monthsView = false;
                 weeksView = true;
                 daysView = false;
+                hoursView = false;
 
                 //disable the other buttons
                 $(yearsBtn).attr("disabled", false);
                 $(monthsBtn).attr("disabled", false);
                 $(weeksBtn).attr("disabled", true);
                 $(daysBtn).attr("disabled", false);
+                $(hoursBtn).attr("disabled", false);
 
-                $(timeline).removeClass('year-view month-view days-view');
+                $(timeline).removeClass('year-view month-view days-view hours-view');
                 $(timeline).addClass('weeks-view');
 
                 //Reset classes, markings for extra and initial events
@@ -292,14 +300,16 @@
                 monthsView = false;
                 weeksView = false;
                 daysView = true;
+                hoursView = false;
 
                 //disable the other buttons
                 $(yearsBtn).attr("disabled", false);
                 $(monthsBtn).attr("disabled", false);
                 $(weeksBtn).attr("disabled", false);
                 $(daysBtn).attr("disabled", true);
+                $(hoursBtn).attr("disabled", false);
 
-                $(timeline).removeClass('year-view month-view weeks-view');
+                $(timeline).removeClass('year-view month-view weeks-view hours-view');
                 $(timeline).addClass('days-view');
 
                 //Reset classes, markings for extra and initial events
@@ -319,6 +329,53 @@
                 _clickBehavior();
             });
 
+            $(hoursBtn).click(function(){
+                var timeline = $('.timeliny-timeline');
+                var timeblock = $('.timeliny-timeblock');
+                var active =  $('.timeliny-timeblock.active');
+                var activeYear = $(active).attr('data-year');
+                var activeMonth = $(active).attr('data-month');
+                var activeDay = $(active).attr('data-day');
+                var activeHour =  $(active).attr('data-hour');
+                var day = $('.inactive-day');
+                var visibleDays = $('.timeliny-timeblock[data-year='+ activeYear +'][data-month='+ activeMonth +'][data-day=' + activeDay +']');
+
+                console.log('hours btn clicked ~!~!~!~!~!~!~!~!~!~!~!~');
+
+                yearsView = false;
+                monthsView = false;
+                weeksView = false;
+                daysView = false;
+                hoursView = true;
+
+                //disable the other buttons
+                $(yearsBtn).attr("disabled", false);
+                $(monthsBtn).attr("disabled", false);
+                $(weeksBtn).attr("disabled", false);
+                $(daysBtn).attr("disabled", false);
+                $(hoursBtn).attr("disabled", true);
+
+                $(timeline).removeClass('year-view month-view weeks-view days-view');
+                $(timeline).addClass('hours-view');
+
+                //Reset classes, markings for extra and initial events
+                $(timeblock).removeClass(' only_event initial_events extra_events');
+
+                //Hide all months
+                $(day).remove();
+
+
+                $(visibleDays).addClass('visibleEvent');
+                $('.visibleEvent').show();
+
+                console.log('actives',activeMonth,  activeYear, 'active hour', activeHour, 'visible days', visibleDays);
+
+
+                _addGhostElems();
+                _updateTimelinePos();
+                _clickBehavior();
+            });
+
         }
 
 		/**
@@ -330,6 +387,7 @@
             var monthsBtn = 	$('.granularity-months');
             var weeksBtn = 		$('.granularity-weeks');
             var daysBtn =   	$('.granularity-days');
+            var hoursBtn =   	$('.granularity-hours');
             var timeline  = 	$('.timeliny-timeline');
             var timeblock  =	$('.timeliny-timeblock');
             var dot  = 			$('.timeliny-dot');
@@ -585,6 +643,53 @@
 
             }
 
+            if(hoursView === true){
+                var firstHour = 0;
+                var lastHour = 23;
+                index = 0;
+                dataYear = $(active).attr('data-year');
+                dataMonth = $(active).attr('data-month');
+                dataDay = $(active).attr('data-day');
+                // dataWeek = $(active).attr('data-week');
+                var dataHour = $(active).attr('data-hour');
+                visibleEvents = $('.timeliny-timeblock[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-day='+ dataDay +']');
+                console.debug('Setting up days datalog');
+
+                //disable the years button
+                // $(daysBtn).attr("disabled", true);
+
+                eventsLog = [];
+
+                eventsLog.length = 0;
+                console.log('clear log', eventsLog, active, dataMonth, dataDay, dataYear, 'dataWeek', dataWeek);
+
+
+                //Add week attribute to all visible events
+                $('.visibleEvent').attr('data-week', dataWeek);
+
+                $(visibleEvents).each(function(){
+                    $(this).addClass('visibleEvent');
+                    var hour = $(this).attr('data-hour');
+
+                    console.log('days log');
+
+                    //Don't add repeating event months to Months Timeline.
+                    if( $.inArray(hour, eventsLog) == -1 ){
+                        console.log('push hour to log');
+
+                        eventsLog.push(hour);
+                        index++;
+                    }
+
+                });
+
+                index= 0;
+                firstFrame = firstHour;
+                lastFrame = lastHour;
+                console.debug('eventsLog for Hours', eventsLog);
+
+            }
+
                 if (options.order === 'asc') {
                     console.debug('ascending list---STATS', firstFrame, lastFrame,'dataMonth', dataMonth);
 
@@ -700,6 +805,33 @@
                             prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ newYprev +']').not(dot);
                             thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-week='+ dataWeek +'][data-day='+ newY +']').not(dot);
                             ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '" data-week="' + dataWeek + '" data-day="' + newY + '" class="inactive inactive-day">'+newY+' ghost frame</div>';
+
+                        }
+
+                        if(hoursView === true){
+                            dataDay = $('.active').attr('data-day');
+                            dataHour = $('.active').attr('data-hour');
+                            console.debug('Adding hoursView ghost frames');
+
+                            frameType = 'timeliny-hour';
+
+                            //Adjust Y into a two digit number
+                            newY = ('0' + y).slice(-2);
+                            newYprev = ('0' + (y - 1)).slice(-2);
+                            console.log('newY', newY, 'Y', y);
+
+
+
+                            search = '[data-year="' + dataYear + '"][data-month="' + dataMonth + '"][data-day='+ dataDay +']';
+                            prevFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-day='+ dataDay +'][data-hour='+ newYprev +']').not(dot);
+                            thisFrame = children.parent().parent().find('[data-year='+ dataYear +'][data-month='+ dataMonth +'][data-day='+ dataDay +'][data-hour='+ newY +']').not(dot);
+                            ghostFrame = '<div data-year="' + dataYear + '" data-month="' + dataMonth + '"  data-day="' + dataDay + '" data-hour="' + newY + '" class="inactive inactive-hour">'+newY+' ghost frame</div>';
+
+
+                            if( $(thisFrame).attr('data-day') !== dataDay){
+                                console.debug('hide inactive days', $(this).attr('data-day'), dataDay);
+                                $(this).removeClass('visibleElement').hide();
+                            }
 
                         }
 
@@ -857,17 +989,18 @@
                 var month =     $(this).attr('data-month');
                 var week =      $(this).attr('data-week');
                 var day =       $(this).attr('data-day');
+                var hour =       $(this).attr('data-hour');
                 var dot =       $(this).find('.timeliny-dot');
                 var dotHtml;
-                var current =   year + month + week + day;
+                var current =   year + month + week + day + hour;
 
                 if( $(text).length ){
                     console.debug('text has length');
-                    dotHtml = '<a href="#' + current +'" class="' + options.className + '-dot" data-year="' + year + '" data-month="' + month + '" data-week="' + week + '" data-day="' + day + '" data-text="  "></a>';
+                    dotHtml = '<a href="#' + current +'" class="' + options.className + '-dot" data-year="' + year + '" data-month="' + month + '" data-week="' + week + '" data-day="' + day + '" data-hour="' + hour + '" data-text="  "></a>';
                 }
                 else{
                     console.debug('text has NO length');
-                    dotHtml = '<a href="#' + current +'" class="' + options.className + '-dot" data-year="' + year + '" data-month="' + month + '" data-week="' + week + '" data-day="' + day + '" data-text="' + text + '"></a>';
+                    dotHtml = '<a href="#' + current +'" class="' + options.className + '-dot" data-year="' + year + '" data-month="' + month + '" data-week="' + week + '" data-day="' + day + '" data-hour="' + hour + '" data-text="' + text + '"></a>';
                 }
 
 				$(this).addClass('' + options.className + '-timeblock').html(dotHtml);
@@ -911,7 +1044,8 @@
                         var currMonth = $el.find('.' + options.className + '-timeblock.active').first().attr('data-month');
                         var currWeek = $el.find('.' + options.className + '-timeblock.active').first().attr('data-week');
                         var currDay = $el.find('.' + options.className + '-timeblock.active').first().attr('data-day');
-                        var current = currYear + currMonth + currWeek + currDay;
+                        var currHour = $el.find('.' + options.className + '-timeblock.active').first().attr('data-hour');
+                        var current = currYear + currMonth + currWeek + currDay + currHour;
 
                         console.debug('CLICKEDDDDDDDDD', 'years', yearsView, 'months', monthsView,'weeks', weeksView, 'current',current);
 
@@ -938,17 +1072,19 @@
         var currMonth = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-month');
         var currWeek = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-week');
         var currDay = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-day');
+        var currHour = $(this).parent().parent().find('.' + options.className + '-timeblock.active').attr('data-hour');
 
         var nextYear = $(this).attr('data-year');
         var nextMonth = $(this).attr('data-month');
         var nextWeek = $(this).attr('data-week');
         var nextDay = $(this).attr('data-day');
+        var nextHour = $(this).attr('data-hour');
 
         $(this).toggleClass('clicked');
 
 
-        var currTarget = currYear + currMonth + currWeek + currDay;
-        var nextTarget = nextYear + nextMonth + nextWeek + nextDay;
+        var currTarget = currYear + currMonth + currWeek + currDay + currHour;
+        var nextTarget = nextYear + nextMonth + nextWeek + nextDay + nextHour;
 
         if (currTarget != nextTarget) {
                 hook('onLeave', [currTarget, nextTarget]);
